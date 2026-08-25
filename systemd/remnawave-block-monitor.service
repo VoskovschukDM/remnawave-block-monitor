@@ -1,0 +1,44 @@
+[Unit]
+Description=Remnawave Block Monitor
+Documentation=https://github.com/VoskovschukDM/remnawave-block-monitor
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=remnawave-monitor
+Group=remnawave-monitor
+WorkingDirectory=/opt/remnawave-block-monitor
+ExecStart=/usr/bin/python3 /opt/remnawave-block-monitor/monitor.py --config /etc/remnawave-block-monitor/config.env
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=30
+UMask=0027
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONUNBUFFERED=1
+
+# Hardening: the service needs only outbound DNS/HTTP(S) and state writes.
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectHostname=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RemoveIPC=true
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadOnlyPaths=/etc/remnawave-block-monitor
+ReadWritePaths=/var/lib/remnawave-block-monitor /var/log/remnawave-block-monitor
+
+[Install]
+WantedBy=multi-user.target

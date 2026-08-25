@@ -1,0 +1,12 @@
+# name | target | type
+# Types: tcp, http, https, auto. Omit type for automatic detection.
+
+# Germany-01 | 94.156.237.252:443 | tcp
+# Netherlands-01 | node1.example.com:443 | tcp
+# Subscription | https://sub.example.com | http
+# Panel | https://panel.example.com | http
+
+# Simple format is supported too:
+# 1.2.3.4
+# node.example.com
+# https://sub.example.com
