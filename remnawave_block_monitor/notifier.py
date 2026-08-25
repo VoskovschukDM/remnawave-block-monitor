@@ -15,13 +15,17 @@ class TelegramNotifier:
         self.enabled = config.telegram_enabled
         self.token = config.telegram_bot_token
         self.chat_id = config.telegram_chat_id
+        self.message_thread_id = config.telegram_message_thread_id
         self.timeout = config.telegram_timeout
         self.http = JsonHttpClient("Telegram", config.http_retry_attempts)
 
     def send(self, text: str) -> None:
         if not self.enabled:
             return
-        body = urlencode({"chat_id": self.chat_id, "text": text[:4000], "disable_web_page_preview": "true"}).encode()
+        fields = {"chat_id": self.chat_id, "text": text[:4000], "disable_web_page_preview": "true"}
+        if self.message_thread_id is not None:
+            fields["message_thread_id"] = str(self.message_thread_id)
+        body = urlencode(fields).encode()
         payload = self.http.request(
             f"https://api.telegram.org/bot{self.token}/sendMessage",
             self.timeout,
@@ -114,3 +118,4 @@ def recovery_message(result: TargetResult, previous: str | None) -> str:
             f"Текущий: {result.analysis.verdict.value}",
         ]
     )
+

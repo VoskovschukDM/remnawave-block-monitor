@@ -26,6 +26,20 @@ class ConfigTests(unittest.TestCase):
             with self.assertRaisesRegex(ConfigError, "TELEGRAM_BOT_TOKEN"):
                 Config.load(path)
 
+    def test_telegram_message_thread_id(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory, "config.env")
+            path.write_text("TELEGRAM_MESSAGE_THREAD_ID=123\n", encoding="utf-8")
+            self.assertEqual(Config.load(path).telegram_message_thread_id, 123)
+
+    def test_telegram_message_thread_id_must_be_positive(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory, "config.env")
+            path.write_text("TELEGRAM_MESSAGE_THREAD_ID=0\n", encoding="utf-8")
+            with self.assertRaisesRegex(ConfigError, "TELEGRAM_MESSAGE_THREAD_ID"):
+                Config.load(path)
+
 
 if __name__ == "__main__":
     unittest.main()
+

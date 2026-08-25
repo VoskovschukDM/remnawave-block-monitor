@@ -28,6 +28,12 @@ def _int(value: str, name: str, minimum: int = 0) -> int:
     return parsed
 
 
+def _optional_int(value: str, name: str, minimum: int = 0) -> int | None:
+    if not value.strip():
+        return None
+    return _int(value, name, minimum)
+
+
 def _float(value: str, name: str, minimum: float = 0.0) -> float:
     try:
         parsed = float(value)
@@ -91,6 +97,7 @@ class Config:
     telegram_enabled: bool = False
     telegram_bot_token: str = ""
     telegram_chat_id: str = ""
+    telegram_message_thread_id: int | None = None
     telegram_timeout: float = 15.0
     targets_file: str = "/etc/remnawave-block-monitor/targets.txt"
     state_file: str = "/var/lib/remnawave-block-monitor/state.json"
@@ -140,6 +147,9 @@ class Config:
             telegram_enabled=_bool(value("TELEGRAM_ENABLED", "false"), "TELEGRAM_ENABLED"),
             telegram_bot_token=value("TELEGRAM_BOT_TOKEN", ""),
             telegram_chat_id=value("TELEGRAM_CHAT_ID", ""),
+            telegram_message_thread_id=_optional_int(
+                value("TELEGRAM_MESSAGE_THREAD_ID", ""), "TELEGRAM_MESSAGE_THREAD_ID", 1
+            ),
             telegram_timeout=_float(value("TELEGRAM_TIMEOUT", "15"), "TELEGRAM_TIMEOUT", 0.1),
             targets_file=value("TARGETS_FILE", "/etc/remnawave-block-monitor/targets.txt"),
             state_file=value("STATE_FILE", "/var/lib/remnawave-block-monitor/state.json"),
@@ -156,3 +166,4 @@ class Config:
     def safe_summary(self) -> dict[str, object]:
         excluded = {"telegram_bot_token", "telegram_chat_id"}
         return {field.name: getattr(self, field.name) for field in fields(self) if field.name not in excluded}
+

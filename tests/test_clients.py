@@ -1,14 +1,16 @@
 import io
 import unittest
 from email.message import Message
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 from urllib.error import HTTPError, URLError
+from urllib.parse import parse_qs
 
 from remnawave_block_monitor.checkhost import CheckHostClient
 from remnawave_block_monitor.cheburcheck import CheburCheckClient
 from remnawave_block_monitor.config import Config
 from remnawave_block_monitor.http_client import ExternalServiceError, JsonHttpClient
 from remnawave_block_monitor.models import Target
+from remnawave_block_monitor.notifier import TelegramNotifier
 
 
 class FakeResponse:
@@ -81,6 +83,37 @@ class ClientTests(unittest.TestCase):
         self.assertTrue(result.blocked)
         self.assertEqual(result.blocked_subnets, ["1.2.0.0/16"])
 
+    def test_telegram_sends_to_configured_topic(self):
+        notifier = TelegramNotifier(
+            Config(
+                telegram_enabled=True,
+                telegram_bot_token="token",
+                telegram_chat_id="-100123",
+                telegram_message_thread_id=456,
+            )
+        )
+        request = Mock(return_value={"ok": True})
+        notifier.http.request = request
+
+        notifier.send("test")
+
+        form = parse_qs(request.call_args.kwargs["data"].decode())
+        self.assertEqual(form["chat_id"], ["-100123"])
+        self.assertEqual(form["message_thread_id"], ["456"])
+
+    def test_telegram_omits_topic_for_general(self):
+        notifier = TelegramNotifier(
+            Config(telegram_enabled=True, telegram_bot_token="token", telegram_chat_id="-100123")
+        )
+        request = Mock(return_value={"ok": True})
+        notifier.http.request = request
+
+        notifier.send("test")
+
+        form = parse_qs(request.call_args.kwargs["data"].decode())
+        self.assertNotIn("message_thread_id", form)
+
 
 if __name__ == "__main__":
     unittest.main()
+

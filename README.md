@@ -87,7 +87,10 @@ sudo nano /etc/remnawave-block-monitor/config.env
 TELEGRAM_ENABLED=true
 TELEGRAM_BOT_TOKEN=123456:token
 TELEGRAM_CHAT_ID=123456789
+TELEGRAM_MESSAGE_THREAD_ID=123
 ```
+
+`TELEGRAM_MESSAGE_THREAD_ID` — числовой ID темы форума Telegram, например темы «Ошибки». Если оставить его пустым, сообщения отправляются в General. Если Bedolaga уже отправляет нужные уведомления в эту тему, можно скопировать ID из её `ADMIN_NOTIFICATIONS_TOPIC_ID`; иначе укажите ID темы «Ошибки».
 
 Проверка без запуска daemon loop:
 
@@ -232,3 +235,4 @@ API проверены при подготовке версии 1.0.0 (2026-08-2
 ## License
 
 MIT.
+
