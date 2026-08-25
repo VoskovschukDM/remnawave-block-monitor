@@ -166,4 +166,3 @@ class Config:
     def safe_summary(self) -> dict[str, object]:
         excluded = {"telegram_bot_token", "telegram_chat_id"}
         return {field.name: getattr(self, field.name) for field in fields(self) if field.name not in excluded}
-

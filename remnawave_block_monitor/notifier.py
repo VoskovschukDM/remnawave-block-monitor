@@ -118,4 +118,3 @@ def recovery_message(result: TargetResult, previous: str | None) -> str:
             f"Текущий: {result.analysis.verdict.value}",
         ]
     )
-
